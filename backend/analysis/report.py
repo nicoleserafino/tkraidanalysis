@@ -180,6 +180,14 @@ async def fetch_full_report(report_code: str) -> dict:
     agg_damage_done: dict[str, int] = {}
     agg_damage_taken: dict[str, int] = {}
 
+    # Per-boss aggregates so hybrid players who swap roles between encounters
+    # (e.g. DPS on one boss, heals on another) are classified per encounter
+    # rather than getting a single static role for the whole night.
+    boss_spell_casts: dict[str, dict[str, dict[str, int]]] = {}
+    boss_healing: dict[str, dict[str, int]] = {}
+    boss_damage_done: dict[str, dict[str, int]] = {}
+    boss_damage_taken: dict[str, dict[str, int]] = {}
+
     async def process_fight(fight: dict, semaphore: asyncio.Semaphore) -> tuple[dict, dict]:
         async with semaphore:
             fight_id = fight["id"]
@@ -243,21 +251,31 @@ async def fetch_full_report(report_code: str) -> dict:
         boss_name = fight["name"]
 
         # Aggregate for role inference
+        bs = boss_spell_casts.setdefault(boss_name, {})
+        bh = boss_healing.setdefault(boss_name, {})
+        bd = boss_damage_done.setdefault(boss_name, {})
+        bt = boss_damage_taken.setdefault(boss_name, {})
+
         for player, spells in pull.get("spell_casts", {}).items():
             agg_spell_casts.setdefault(player, {})
+            bs.setdefault(player, {})
             for spell, count in spells.items():
                 agg_spell_casts[player][spell] = agg_spell_casts[player].get(spell, 0) + count
+                bs[player][spell] = bs[player].get(spell, 0) + count
 
         for player, details in pull.get("heal_details", {}).items():
             for info in details.values():
                 agg_healing[player] = agg_healing.get(player, 0) + info.get("total", 0)
+                bh[player] = bh.get(player, 0) + info.get("total", 0)
 
         for player, spells in pull.get("damage_done", {}).items():
             for total in spells.values():
                 agg_damage_done[player] = agg_damage_done.get(player, 0) + total
+                bd[player] = bd.get(player, 0) + total
 
         for player, total in pull.get("player_damage_taken_total", {}).items():
             agg_damage_taken[player] = agg_damage_taken.get(player, 0) + total
+            bt[player] = bt.get(player, 0) + total
 
         if boss_name not in bosses:
             bosses[boss_name] = {"total_pulls": 0, "kills": 0, "wipes": 0, "pulls": []}
@@ -290,12 +308,48 @@ async def fetch_full_report(report_code: str) -> dict:
         )
         player_info[name] = {"role": role, "class": player_class}
 
-    # Attach roles to each pull
-    for boss_entry in bosses.values():
+    # Per-boss role classification: players can swap roles between encounters
+    # (e.g. DPS on TK bosses, heal on SSC bosses). Classify each player per boss
+    # using only that boss's healing/damage/casts so hybrids aren't mislabelled.
+    boss_roles: dict[str, dict[str, str]] = {}
+    for boss_name, boss_entry in bosses.items():
+        names_here: set[str] = set()
+        for pull in boss_entry["pulls"]:
+            names_here.update(pull.get("players", []))
+        roles_here: dict[str, str] = {}
+        for name in names_here:
+            if name not in player_info:
+                continue
+            roles_here[name] = infer_role(
+                player_info[name]["class"],
+                spell_counts=boss_spell_casts.get(boss_name, {}).get(name, {}),
+                total_healing=boss_healing.get(boss_name, {}).get(name, 0),
+                total_damage_done=boss_damage_done.get(boss_name, {}).get(name, 0),
+                total_damage_taken=boss_damage_taken.get(boss_name, {}).get(name, 0),
+            )
+        boss_roles[boss_name] = roles_here
+
+    # Set each player's global/primary role to the role they held on the most
+    # bosses (fallback used where a pull has no per-boss role). This keeps the
+    # roster summary sensible for hybrids instead of skewing to their aggregate.
+    for name, info in player_info.items():
+        counts: dict[str, int] = {}
+        for roles_here in boss_roles.values():
+            r = roles_here.get(name)
+            if r:
+                counts[r] = counts.get(r, 0) + 1
+        if counts:
+            info["role"] = max(counts, key=lambda r: counts[r])
+
+    # Attach roles to each pull (per-boss role takes priority over global primary).
+    for boss_name, boss_entry in bosses.items():
+        roles_here = boss_roles.get(boss_name, {})
         for pull in boss_entry["pulls"]:
             pull["roles"] = {}
             for name in pull.get("players", []):
-                if name in player_info:
+                if name in roles_here:
+                    pull["roles"][name] = roles_here[name]
+                elif name in player_info:
                     pull["roles"][name] = player_info[name]["role"]
 
             # Finalize threat-cause classification now that tank/healer/DPS roles are known.
