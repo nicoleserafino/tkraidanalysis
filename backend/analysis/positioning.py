@@ -43,7 +43,9 @@ TRACKED_MECHANICS = {
     # Kaz'rogal - Mark of Kaz'rogal: drains mana, then detonates for AoE damage
     # to everyone nearby when mana hits 0. Mana users must spread from the raid.
     # (31447 = the applied debuff aura; 31463 = the detonation damage.)
-    31447: {"name": "Mark of Kaz'rogal", "boss": "Kaz'rogal", "spread_range": 400, "type": "spread"},
+    # The application itself is unavoidable (it targets mana users), so proximity
+    # at apply-time is NOT a failure — the failure is detonating near others.
+    31447: {"name": "Mark of Kaz'rogal", "boss": "Kaz'rogal", "spread_range": 400, "type": "spread", "application_expected": True},
     # Archimonde - Air Burst: knocks the target into the air; the fall is what kills
     # (Tears of the Goddess negates it). We flag who got hit / who was clustered.
     32014: {"name": "Air Burst", "boss": "Archimonde", "spread_range": 500, "type": "spread"},
@@ -54,7 +56,9 @@ TRACKED_MECHANICS = {
     # Mother Shahraz - Fatal Attraction: teleports 3 players together; they take
     # escalating damage while close to each other and MUST spread apart fast.
     # (41001 = the applied debuff; 40870 is the parent spell, never applied.)
-    41001: {"name": "Fatal Attraction", "boss": "Mother Shahraz", "spread_range": 4000, "type": "spread"},
+    # Targets are TELEPORTED together, so they are ~0yd at application by design —
+    # apply-time proximity is expected; the real metric is how fast they separate.
+    41001: {"name": "Fatal Attraction", "boss": "Mother Shahraz", "spread_range": 4000, "type": "spread", "application_expected": True},
     # Illidan Stormrage - Parasitic Shadowfiend: debuff that spawns adds; affected
     # players spread from the raid so the fiends don't chain-infect everyone.
     41917: {"name": "Parasitic Shadowfiend", "boss": "Illidan Stormrage", "spread_range": 800, "type": "spread"},
@@ -127,6 +131,26 @@ query ($code: String!) {
 def _distance(p1: dict, p2: dict) -> float:
     """Euclidean distance between two position points."""
     return math.sqrt((p1["x"] - p2["x"]) ** 2 + (p1["y"] - p2["y"]) ** 2)
+
+
+# Two players cannot truly occupy the exact same integer coordinate; identical
+# coords (or the (0,0) sentinel) almost always mean the position was unresolved
+# in the sampling window, so a computed "0 yard" gap there is an artifact, not a
+# real stack. We also reject pairs whose position samples are too far apart in
+# time to be a meaningful simultaneous distance.
+_MAX_PAIR_SKEW_MS = 1500
+
+
+def _reliable_pair(p1: dict, p2: dict) -> bool:
+    """True only when a distance between two sampled positions is trustworthy."""
+    for p in (p1, p2):
+        if p.get("x", 0) == 0 and p.get("y", 0) == 0:
+            return False  # (0,0) sentinel / unresolved
+    if p1["x"] == p2["x"] and p1["y"] == p2["y"]:
+        return False  # identical coords = sampling artifact, not a real 0yd stack
+    if abs(p1.get("ts", 0) - p2.get("ts", 0)) > _MAX_PAIR_SKEW_MS:
+        return False  # samples too far apart in time to compare
+    return True
 
 
 # WCL coordinates are ~87.5 units per yard (derived from conflag 8yd = ~700 units)
@@ -267,8 +291,11 @@ async def fetch_positioning_data(report_code: str, fight_id: int) -> dict[str, A
         if ability_id not in fired_ids:
             fired_ids.append(ability_id)
 
-        # Group events within 500ms as same cast
-        if current_group is None or abs(ts - current_group["timestamp"]) > 500:
+        # Group events within 500ms of the SAME ability as one cast. Different
+        # abilities firing close together must not be merged into one snapshot.
+        if (current_group is None
+                or ability_id != current_group["ability_id"]
+                or abs(ts - current_group["timestamp"]) > 500):
             current_group = {
                 "timestamp": ts,
                 "ability_id": ability_id,
@@ -316,6 +343,8 @@ async def fetch_positioning_data(report_code: str, fight_id: int) -> dict[str, A
                         if key in seen_pairs:
                             continue
                         seen_pairs.add(key)
+                        if not _reliable_pair(positions[t1], positions[t2]):
+                            continue
                         dist = _distance(positions[t1], positions[t2])
                         proximity_issues.append({
                             "player": t2,
@@ -333,6 +362,8 @@ async def fetch_positioning_data(report_code: str, fight_id: int) -> dict[str, A
                 for t2 in targets[i + 1:]:
                     if t2 not in positions:
                         continue
+                    if not _reliable_pair(positions[t1], positions[t2]):
+                        continue
                     dist = _distance(positions[t1], positions[t2])
                     if dist < spread_range:
                         proximity_issues.append({
@@ -347,6 +378,8 @@ async def fetch_positioning_data(report_code: str, fight_id: int) -> dict[str, A
                     continue
                 for name, pos in positions.items():
                     if name in targets:
+                        continue
+                    if not _reliable_pair(positions[t], pos):
                         continue
                     dist = _distance(positions[t], pos)
                     if dist < spread_range:
@@ -380,6 +413,7 @@ async def fetch_positioning_data(report_code: str, fight_id: int) -> dict[str, A
             "proximity_issues": proximity_issues,
             "spread_range": spread_range,
             "mechanic_type": mechanic_info.get("type", "unknown"),
+            "initial_expected": bool(mechanic_info.get("application_expected", False)),
         })
 
     return {
@@ -404,6 +438,9 @@ def summarize_player_positioning(
 
     Returns human-readable lines describing where THIS player was hit by, or
     clustered too close to others during, a tracked spread/proximity mechanic.
+    Distances are only asserted when the underlying position samples are
+    reliable (see ``_reliable_pair``); for teleport / unavoidable-application
+    mechanics we describe the exposure rather than claiming an apply-time gap.
     Empty list when the player had no positioning issues (or no mechanics fired).
     """
     findings: list[str] = []
@@ -415,15 +452,29 @@ def summarize_player_positioning(
         t = snap.get("time_s", 0)
         targets = snap.get("targets", []) or []
         issues = snap.get("proximity_issues", []) or []
+        initial_expected = snap.get("initial_expected", False)
 
         was_hit = player_name in targets
 
-        # Closest clustering issue that involves this player.
+        # Closest clustering issue that involves this player (already reliability-
+        # filtered upstream, so any distance here is trustworthy).
         involved = [
             iss for iss in issues
             if iss.get("player") == player_name or iss.get("near") == player_name
         ]
         involved.sort(key=lambda x: x.get("distance", 9999))
+
+        if initial_expected:
+            # Targets are teleported/marked together by design — apply-time
+            # proximity is expected, so we report exposure, not a "spread" miss.
+            if was_hit:
+                others = [n for n in targets if n != player_name]
+                with_who = f" with {', '.join(others)}" if others else ""
+                findings.append(
+                    f"{ability} at {t}s: was a target{with_who} — react immediately "
+                    f"(separate/manage), this is not an apply-time spread error."
+                )
+            continue
 
         if was_hit and involved:
             near = involved[0]

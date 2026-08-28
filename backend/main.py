@@ -411,6 +411,9 @@ async def post_ai_advice(req: AIAdviceRequest):
     import hashlib, json
 
     pull_data = dict(req.pull_data or {})
+    # Never trust a client-supplied enrichment field; it is populated server-side
+    # only, from freshly fetched position data.
+    pull_data.pop("positioning_findings", None)
 
     # Enrich with measured positioning/spread findings for this player when we
     # have the identifiers to fetch them (frontend passes report_code + fight_id).
