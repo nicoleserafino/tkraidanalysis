@@ -586,6 +586,10 @@ def build_pull_data(
         "Heal",
         # Solarian adds
         "Greater Heal",
+        # Illidari Council (Lady Malande heals, Veras/Gathios casts)
+        "Flash Heal", "Holy Fire", "Consecration",
+        # Illidan / Shade of Akama channelers & Reliquary of Souls
+        "Dark Barrage", "Spirit Shock",
         # General
         "Shadow Bolt Volley", "Fear", "Bellowing Roar",
     }

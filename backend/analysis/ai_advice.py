@@ -18,6 +18,7 @@ FOR ALL PLAYERS:
 - Deaths: What killed them? Was it avoidable? What cooldowns/consumables could have saved them?
 - Damage Taken: Are they taking unnecessary damage? Standing in mechanics? Getting hit by avoidable abilities?
 - Positioning: Based on damage sources, were they in the wrong spot? (e.g., getting Spout on Lurker, Conflag on Kael)
+- If a POSITIONING / SPREAD section is present, it is measured from actual position data — treat it as authoritative and cite the specific mechanic, distance, and who they were too close to.
 - Boss Mechanics: Did they handle the boss's specific mechanics properly based on their role?
 - Consumable/Buff usage: Are they using healthstones, potions, or cooldowns when in danger?
 
@@ -52,6 +53,20 @@ BOSS-SPECIFIC KNOWLEDGE (use when relevant):
 - Al'ar: Platform transitions, meteor dive, adds in P2
 - Void Reaver: Arcane Orbs (move away), simple tank-and-spank with knockback
 - Solarian: Wrath of Astromancer (run out), adds, split phase
+- Rage Winterchill (Hyjal): Death & Decay (move out of the ground pool), Frost Nova root (don't get frozen inside D&D), Icebolt is a tank/target debuff — burn him before Icebolts stack
+- Anetheron (Hyjal): Carrion Swarm is a frontal healing-drain cone (don't stack in front), dispel/wake Sleep, tank & AoE the Infernal adds, spread for Immolation aura
+- Kaz'rogal (Hyjal): Mark of Kaz'rogal drains mana then DETONATES for AoE when it hits 0 — spread away from the raid when marked and dump mana; War Stomp stun; kill him before too many marks pop
+- Azgalor (Hyjal): Rain of Fire (move out or take Unquenchable Flames), Doom is an unavoidable debuff that kills the target and spawns a Lesser Doomguard (off-tank picks it up), Howl of Azgalor is a raid-wide silence (heal/HoT ahead of it), Cleave (tanks face away)
+- Archimonde (Hyjal): use Tears of the Goddess to negate Air Burst FALL damage (pop it just before landing) — NO falling deaths; Fear is NOT stopped by Tears (use fear protection/dispels and don't get feared off the platform or into Doomfire); avoid Doomfire (moving fire), spread for Soul Charges
+- Naj'entus (BT): free trapped players by clicking the Impaling Spine, casters strip Tidal Shield with spine shards, spread for Needle Spine
+- Supremus (BT): dodge Molten Flame gouts and Volcanic Geysers, run from him during the fixate/kite phase (he chases a random target)
+- Shade of Akama (BT): kill Channelers in order to free Akama, control the defender adds, protect Akama
+- Teron Gorefiend (BT): Shadow of Death turns dead players into Constructs — use the ghost ability bar to kill the Vengeful Spirits or they wipe the raid
+- Gurtogg Bloodboil (BT): Bloodboil targets the furthest players (rotate the soak group), Fel Rage target gets tank-swapped with heavy healing, spread for Acidic Wound
+- Reliquary of Souls (BT): three essences. P1 (Suffering) all healing/regen is disabled — direct-heal only, HoTs useless, tank-swap on proximity aggro. P2 (Desire) INTERRUPT Spirit Shock on a rotation and dispel/purge Rune Shield; Aura of Desire mana-burns and reflects, so watch mana and avoid overhealing. P3 (Anger) escalating raid-wide damage burn — don't rip threat, spread for Spite.
+- Mother Shahraz (BT): Fatal Attraction teleports 3 players together — SPREAD instantly or the escalating damage kills you; resistance-gear/Prismatic Shield rotation; tanks stack for Saber Lash
+- Illidari Council (BT): interrupt Lady Malande's heals, spread for Gathios Consecration/Blizzard, tank all four separately and burn evenly
+- Illidan Stormrage (BT): move out of Flame Crash, spread for Parasitic Shadowfiend adds, Flames of Azzinoth phase (two tanks keep the elementals apart), don't move during Shadow Prison, shadow-resist tank for Demon-form Shadow Blast
 
 RULES:
 - Be specific — reference actual numbers from the data (damage amounts, death times, specific spells)
@@ -316,6 +331,13 @@ def _build_player_context(
             lines.append(f"\n=== CLUTCH SAVES (player made) ===")
             for h in player_clutch[:5]:
                 lines.append(f"  - Saved {h.get('target','?')} at {h.get('hp_pct',0)}% HP with {h.get('spell','?')}")
+
+    # === POSITIONING / SPREAD (from position-tracked mechanics) ===
+    pos_findings = pull_data.get("positioning_findings")
+    if isinstance(pos_findings, list) and pos_findings:
+        lines.append(f"\n=== POSITIONING / SPREAD (measured from position data) ===")
+        for f in pos_findings[:8]:
+            lines.append(f"  - {f}")
 
     lines.append(f"\n=== COACHING REQUEST ===")
     lines.append(f"Based on the above data, provide specific coaching for {player_name} ({player_class} {player_role}) on this {boss_name} {'kill' if kill else 'wipe'}.")

@@ -4250,7 +4250,9 @@
             player_class: meta.class || 'Unknown',
             player_role: getPlayerRole(playerName),
             boss_name: state.boss || 'Unknown',
-            pull_data: pull || {}
+            pull_data: pull || {},
+            report_code: state.reportCode || null,
+            fight_id: (pull && pull.fight_id != null) ? pull.fight_id : null
           })
         });
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);

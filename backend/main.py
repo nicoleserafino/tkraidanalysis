@@ -8,7 +8,7 @@ import time
 import traceback
 from collections.abc import Awaitable, Callable
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
@@ -383,20 +383,51 @@ class AIAdviceRequest(BaseModel):
     player_role: str
     boss_name: str
     pull_data: dict[str, Any]
+    report_code: Optional[str] = None
+    fight_id: Optional[int] = None
 
 
 _ai_advice_cache: dict[str, tuple[float, str]] = {}
+_positioning_cache: dict[str, tuple[float, dict]] = {}
+
+
+async def _get_positioning_cached(code: str, fight_id: int) -> dict:
+    """Fetch (and cache) positioning data so AI advice reuses the tab's result."""
+    from backend.analysis.positioning import fetch_positioning_data
+    key = f"{code}:{fight_id}"
+    cached = _positioning_cache.get(key)
+    if cached and _is_cache_fresh(cached[0], ttl=1800):
+        return cached[1]
+    result = await fetch_positioning_data(code, fight_id)
+    _positioning_cache[key] = (time.time(), result)
+    return result
 
 
 @app.post("/api/report/ai-advice")
 async def post_ai_advice(req: AIAdviceRequest):
     """Get AI-powered individual player advice for a specific fight."""
     from backend.analysis.ai_advice import get_ai_advice
+    from backend.analysis.positioning import summarize_player_positioning
     import hashlib, json
+
+    pull_data = dict(req.pull_data or {})
+
+    # Enrich with measured positioning/spread findings for this player when we
+    # have the identifiers to fetch them (frontend passes report_code + fight_id).
+    fight_id = req.fight_id if req.fight_id is not None else pull_data.get("fight_id")
+    if req.report_code and fight_id is not None:
+        try:
+            code = extract_report_code(req.report_code)
+            positioning = await _get_positioning_cached(code, int(fight_id))
+            findings = summarize_player_positioning(positioning, req.player_name)
+            if findings:
+                pull_data["positioning_findings"] = findings
+        except Exception as e:  # positioning is best-effort enrichment, never fatal
+            logger.warning("Positioning enrichment failed: %s", e)
 
     # Cache key based on player + boss + pull summary
     cache_key = hashlib.md5(
-        f"{req.player_name}:{req.boss_name}:{json.dumps(req.pull_data, sort_keys=True, default=str)[:2000]}".encode()
+        f"{req.player_name}:{req.boss_name}:{json.dumps(pull_data, sort_keys=True, default=str)[:2000]}".encode()
     ).hexdigest()
 
     cached = _ai_advice_cache.get(cache_key)
@@ -409,7 +440,7 @@ async def post_ai_advice(req: AIAdviceRequest):
             player_class=req.player_class,
             player_role=req.player_role,
             boss_name=req.boss_name,
-            pull_data=req.pull_data,
+            pull_data=pull_data,
         )
         _ai_advice_cache[cache_key] = (time.time(), advice)
         return {"advice": advice}

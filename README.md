@@ -72,18 +72,42 @@ Click the **Compare Logs** button in the top bar (visible after loading a report
 
 ## Supported Bosses
 
-Works with any TBC raid boss, with enhanced mechanic tracking for:
+Works with any TBC raid boss. Instance detection, boss ordering, attendance,
+and progression tracking cover all four current-tier raids — Serpentshrine
+Cavern (SSC), Tempest Keep (TK), Mount Hyjal (MH), and Black Temple (BT) — with
+enhanced mechanic tracking for:
 
+**Tempest Keep**
 - Al'ar
 - Void Reaver
 - High Astromancer Solarian
 - Kael'thas Sunstrider (conflagration tracking, phase detection)
+
+**Serpentshrine Cavern**
 - Hydross the Unstable
 - The Lurker Below
-- Leotheras the Blind
+- Leotheras the Blind (whirlwind positioning)
 - Fathom-Lord Karathress
 - Morogrim Tidewalker
 - Lady Vashj
+
+**Mount Hyjal**
+- Rage Winterchill
+- Anetheron
+- Kaz'rogal (Mark spread tracking)
+- Azgalor
+- Archimonde (Air Burst spread/fall tracking)
+
+**Black Temple**
+- High Warlord Naj'entus
+- Supremus
+- Shade of Akama
+- Teron Gorefiend
+- Gurtogg Bloodboil
+- Reliquary of Souls
+- Mother Shahraz (Fatal Attraction spread)
+- The Illidari Council
+- Illidan Stormrage (Parasitic Shadowfiend spread)
 
 ## Documentation
 

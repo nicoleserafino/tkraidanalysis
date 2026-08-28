@@ -10,13 +10,7 @@ from backend.wcl.client import graphql_query
 from backend.wcl.queries import GUILD_ATTENDANCE, REPORT_EVENTS, REPORT_FIGHTS, REPORT_TABLE
 from backend.analysis.report import fetch_report_metadata, fetch_events_paginated, fetch_table
 from backend.analysis.utils import spell_name
-
-# TBC encounter IDs by instance
-SSC_ENCOUNTER_IDS = {623, 624, 625, 626, 627, 628}  # Hydross, Lurker, Leo, Karathress, Morogrim, Vashj
-TK_ENCOUNTER_IDS = {730, 731, 732, 733}  # Al'ar, VR, Solarian, Kael'thas
-# Boss name substrings for fallback detection
-SSC_BOSS_NAMES = {"Hydross", "Lurker", "Leotheras", "Karathress", "Morogrim", "Vashj"}
-TK_BOSS_NAMES = {"Al'ar", "Void Reaver", "Solarian", "Kael'thas"}
+from backend.analysis.instances import boss_order as canonical_boss_order, classify_instances
 
 # Enchantable gear slots (index in CombatantInfo gear array)
 # 0=Head, 2=Shoulder, 4=Chest, 6=Legs, 7=Feet, 8=Wrist, 9=Hands,
@@ -263,16 +257,8 @@ def _lockout_week(timestamp_ms: int) -> str:
 
 
 def _detect_instance(fights: list[dict]) -> set[str]:
-    """Determine which raid instances (SSC / TK) a report covers."""
-    instances: set[str] = set()
-    for f in fights:
-        eid = f.get("encounterID", 0)
-        name = f.get("name", "")
-        if eid in SSC_ENCOUNTER_IDS or any(b in name for b in SSC_BOSS_NAMES):
-            instances.add("SSC")
-        if eid in TK_ENCOUNTER_IDS or any(b in name for b in TK_BOSS_NAMES):
-            instances.add("TK")
-    return instances
+    """Determine which raid instances (SSC / TK / MH / BT) a report covers."""
+    return classify_instances(fights)
 
 
 async def _fetch_report_instances(report_code: str) -> set[str]:
@@ -753,12 +739,8 @@ async def fetch_guild_progress(guild_id: int, num_raids: int = 50) -> dict[str, 
             })
 
     # Compute stats per boss
-    # Sort bosses in canonical SSC/TK order
-    BOSS_ORDER = [
-        "Hydross the Unstable", "The Lurker Below", "Leotheras the Blind",
-        "Fathom-Lord Karathress", "Morogrim Tidewalker", "Lady Vashj",
-        "Al'ar", "Void Reaver", "High Astromancer Solarian", "Kael'thas Sunstrider",
-    ]
+    # Sort bosses in canonical SSC/TK/MH/BT order
+    BOSS_ORDER = canonical_boss_order()
 
     progress = []
     for boss_name in BOSS_ORDER:
@@ -901,11 +883,7 @@ async def fetch_wipe_analysis(guild_id: int, num_raids: int = 15) -> dict[str, A
         for wipe in raid_wipes:
             boss_wipes.setdefault(wipe["boss"], []).append(wipe)
 
-    BOSS_ORDER = [
-        "Hydross the Unstable", "The Lurker Below", "Leotheras the Blind",
-        "Fathom-Lord Karathress", "Morogrim Tidewalker", "Lady Vashj",
-        "Al'ar", "Void Reaver", "High Astromancer Solarian", "Kael'thas Sunstrider",
-    ]
+    BOSS_ORDER = canonical_boss_order()
 
     summary = []
     seen = set()

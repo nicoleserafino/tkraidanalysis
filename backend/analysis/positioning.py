@@ -38,6 +38,29 @@ TRACKED_MECHANICS = {
     35181: {"name": "Dive Bomb", "boss": "Al'ar", "spread_range": 700, "type": "spread"},
     # Void Reaver - Arcane Orb (spread to avoid splash + silence)
     34172: {"name": "Arcane Orb", "boss": "Void Reaver", "spread_range": 500, "type": "spread"},
+
+    # ── Mount Hyjal ────────────────────────────────────────────────────────
+    # Kaz'rogal - Mark of Kaz'rogal: drains mana, then detonates for AoE damage
+    # to everyone nearby when mana hits 0. Mana users must spread from the raid.
+    # (31447 = the applied debuff aura; 31463 = the detonation damage.)
+    31447: {"name": "Mark of Kaz'rogal", "boss": "Kaz'rogal", "spread_range": 400, "type": "spread"},
+    # Archimonde - Air Burst: knocks the target into the air; the fall is what kills
+    # (Tears of the Goddess negates it). We flag who got hit / who was clustered.
+    32014: {"name": "Air Burst", "boss": "Archimonde", "spread_range": 500, "type": "spread"},
+
+    # ── Black Temple ───────────────────────────────────────────────────────
+    # Spell IDs verified against a real full-clear log (BHLKntbk6xMc839R) by
+    # counting applydebuff events per boss.
+    # Mother Shahraz - Fatal Attraction: teleports 3 players together; they take
+    # escalating damage while close to each other and MUST spread apart fast.
+    # (41001 = the applied debuff; 40870 is the parent spell, never applied.)
+    41001: {"name": "Fatal Attraction", "boss": "Mother Shahraz", "spread_range": 4000, "type": "spread"},
+    # Illidan Stormrage - Parasitic Shadowfiend: debuff that spawns adds; affected
+    # players spread from the raid so the fiends don't chain-infect everyone.
+    41917: {"name": "Parasitic Shadowfiend", "boss": "Illidan Stormrage", "spread_range": 800, "type": "spread"},
+    # Illidan Stormrage - Agonizing Flames: a fire DoT that also burns nearby
+    # allies; the target runs away from the raid to avoid spreading it.
+    40932: {"name": "Agonizing Flames", "boss": "Illidan Stormrage", "spread_range": 700, "type": "spread"},
 }
 
 POSITION_QUERY = """
@@ -233,6 +256,7 @@ async def fetch_positioning_data(report_code: str, fight_id: int) -> dict[str, A
     # Group apply events by timestamp (same-time applies = one mechanic cast)
     mechanic_instances: list[dict] = []
     current_group: dict | None = None
+    fired_ids: list[int] = []
 
     for e in debuff_events:
         if e.get("type") != "applydebuff":
@@ -240,6 +264,8 @@ async def fetch_positioning_data(report_code: str, fight_id: int) -> dict[str, A
         ts = e["timestamp"]
         ability_id = e.get("abilityGameID", 0)
         target_name = player_map.get(e.get("targetID"), "Unknown")
+        if ability_id not in fired_ids:
+            fired_ids.append(ability_id)
 
         # Group events within 500ms as same cast
         if current_group is None or abs(ts - current_group["timestamp"]) > 500:
@@ -361,10 +387,64 @@ async def fetch_positioning_data(report_code: str, fight_id: int) -> dict[str, A
         "fight_id": fight_id,
         "kill": fight.get("kill", False),
         "duration_s": round(duration_s, 1),
-        "has_mechanics": True,
+        "has_mechanics": bool(fired_ids),
         "tracked_abilities": [
-            {"id": mid, "name": info["name"], "type": info.get("type", "unknown")}
-            for mid, info in fight_mechanics.items()
+            {"id": mid, "name": fight_mechanics[mid]["name"],
+             "type": fight_mechanics[mid].get("type", "unknown")}
+            for mid in fired_ids if mid in fight_mechanics
         ],
         "snapshots": snapshots,
     }
+
+
+def summarize_player_positioning(
+    positioning: dict[str, Any], player_name: str
+) -> list[str]:
+    """Distil a positioning result into terse per-player findings for AI coaching.
+
+    Returns human-readable lines describing where THIS player was hit by, or
+    clustered too close to others during, a tracked spread/proximity mechanic.
+    Empty list when the player had no positioning issues (or no mechanics fired).
+    """
+    findings: list[str] = []
+    if not positioning or not positioning.get("has_mechanics"):
+        return findings
+
+    for snap in positioning.get("snapshots", []):
+        ability = snap.get("ability", "a mechanic")
+        t = snap.get("time_s", 0)
+        targets = snap.get("targets", []) or []
+        issues = snap.get("proximity_issues", []) or []
+
+        was_hit = player_name in targets
+
+        # Closest clustering issue that involves this player.
+        involved = [
+            iss for iss in issues
+            if iss.get("player") == player_name or iss.get("near") == player_name
+        ]
+        involved.sort(key=lambda x: x.get("distance", 9999))
+
+        if was_hit and involved:
+            near = involved[0]
+            other = near["near"] if near.get("player") == player_name else near["player"]
+            findings.append(
+                f"{ability} at {t}s: HIT while only {near.get('distance')}yd from "
+                f"{other} — needed to spread further."
+            )
+        elif was_hit:
+            findings.append(f"{ability} at {t}s: was a target (hit).")
+        elif involved:
+            near = involved[0]
+            other = near["near"] if near.get("player") == player_name else near["player"]
+            itype = near.get("type", "")
+            if itype == "close_call":
+                findings.append(
+                    f"{ability} at {t}s: was {near.get('distance')}yd from {other} "
+                    f"(hit) — close call, tighten spread."
+                )
+            else:
+                findings.append(
+                    f"{ability} at {t}s: clustered {near.get('distance')}yd from {other}."
+                )
+    return findings
