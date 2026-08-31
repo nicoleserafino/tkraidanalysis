@@ -6413,6 +6413,195 @@
             { title: 'Wowhead TBC Solarian Guide', url: 'https://tbc.wowhead.com/guides/high-astromancer-solarian-the-eye-tempest-keep-raid-strategy' },
             { title: 'Warcraft Tavern — Solarian Strategy', url: 'https://www.warcrafttavern.com/tbc/guides/high-astromancer-solarian/' },
           ]
+        },
+        "Rage Winterchill": {
+          overview: `Rage Winterchill is the first boss of the Battle for Mount Hyjal — a frost caster with an enrage timer. A fast, healing-intensive fight where the danger is a random-target encase debuff and standing in ground effects, not tank damage.`,
+          phases: [
+            { name: 'Single Phase (soft enrage)', details: `Tank & spank with three things to respect:<br><br><strong>Icebolt:</strong> Hits a RANDOM non-tank player — encases/stuns them and deals heavy frost burst + a DoT. It must be HEALED through (or broken with a trinket / Ice Block / etc.), it is not a tank mechanic. This is the #1 killer here.<br><strong>Death and Decay:</strong> Purple ground pool — move out immediately, it ramps fast.<br><strong>Frost Nova:</strong> Roots players in place — do NOT get frozen while standing in Death and Decay, or you can't escape it.<br><strong>Soft enrage:</strong> Kill him before healer mana runs out.` }
+          ],
+          tankStrategy: `Straightforward threat hold — face him wherever is convenient, he has no cleave to dodge. Keep threat high so the burn stays fast; the fight is a race against the soft enrage and healer mana.`,
+          healerStrategy: `This is a healer check. Watch for Icebolt on random raiders — the encased player takes heavy burst + DoT and can die fast if ignored. Keep everyone topped because Death and Decay + Frost Nova combos catch people. Manage mana for the soft enrage.`,
+          dpsStrategy: `Move out of Death and Decay instantly. Don't get Frost Nova'd inside a ground pool. If you're Icebolt-encased, someone breaks/heals you — call it. Pure burn otherwise; use cooldowns to beat the enrage.`,
+          references: [
+            { title: 'Wowhead TBC Rage Winterchill Guide', url: 'https://tbc.wowhead.com/guides/rage-winterchill-battle-for-mount-hyjal-raid-strategy' },
+            { title: 'Warcraft Tavern — Rage Winterchill Strategy', url: 'https://www.warcrafttavern.com/tbc/guides/rage-winterchill/' },
+          ]
+        },
+        "Anetheron": {
+          overview: `Anetheron is the second Hyjal boss. The fight layers a frontal healing-drain cone, a sleep mechanic, and Infernal adds on top of a tank-and-spank — positioning and add control decide it.`,
+          phases: [
+            { name: 'Single Phase + Infernal waves', details: `<strong>Carrion Swarm:</strong> Frontal cone that drains healing done and knocks back — healers and raid must NOT stand in front of him.<br><strong>Sleep:</strong> Puts a random player to sleep — dispel/wake them fast (they're vulnerable and useless while asleep).<br><strong>Infernals:</strong> Rain down periodically with an Immolation aura — tank/AoE them down and spread so the aura doesn't chunk the raid.<br><strong>Inferno damage:</strong> Steady raid damage — keep the raid topped.` }
+          ],
+          tankStrategy: `Face Anetheron away from the raid so Carrion Swarm never hits the group. Have an add tank ready to scoop Infernals the instant they land and drag them to the AoE pile.`,
+          healerStrategy: `Never stand in the frontal Carrion Swarm cone — it drains your healing. Dispel Sleep immediately. Expect steady Immolation-aura raid damage from Infernals; pre-position out of the melee cluster.`,
+          dpsStrategy: `Stay out of the frontal cone. Swap to Infernals as they spawn, then back to boss. Spread for Immolation aura. Wake sleeping allies if you have a dispel.`,
+          references: [
+            { title: 'Wowhead TBC Anetheron Guide', url: 'https://tbc.wowhead.com/guides/anetheron-battle-for-mount-hyjal-raid-strategy' },
+            { title: 'Warcraft Tavern — Anetheron Strategy', url: 'https://www.warcrafttavern.com/tbc/guides/anetheron/' },
+          ]
+        },
+        "Kaz'rogal": {
+          overview: `Kaz'rogal is the third Hyjal boss and a mana-management race. Mark of Kaz'rogal drains mana and then explodes when the target bottoms out — the whole fight is about not chain-detonating your casters.`,
+          phases: [
+            { name: 'Single Phase (mana burn race)', details: `<strong>Mark of Kaz'rogal:</strong> Applied to mana users — it drains mana rapidly and, when it hits 0, DETONATES for heavy AoE that spreads the mark to nearby mana users. This chain-reaction is the wipe.<br><strong>War Stomp:</strong> AoE stun on nearby players.<br><strong>Cleave / Cripple:</strong> Melee positioning + slow debuff.<br><strong>Enrage:</strong> Kill him before too many marks have popped and drained the raid.` }
+          ],
+          tankStrategy: `Standard threat hold and face him away from the raid for Cleave. The clock is the number of Mark detonations, so keep the burn fast and threat high.`,
+          healerStrategy: `CONSERVE and manage mana — do not run yourself dry, because a mana user at 0 detonates. Spread from other mana users so a Mark pop doesn't chain to you. Use mana pots proactively; healers dying to their own Mark is the classic wipe.`,
+          dpsStrategy: `Mana users: spread AWAY from the raid and each other, and manage mana (pots, druids shift out) so your Mark detonation is small and doesn't chain. Non-mana classes bring the burst. Beat the enrage before marks stack the raid down.`,
+          references: [
+            { title: 'Wowhead TBC Kaz\'rogal Guide', url: 'https://tbc.wowhead.com/guides/kazrogal-battle-for-mount-hyjal-raid-strategy' },
+            { title: 'Warcraft Tavern — Kaz\'rogal Strategy', url: 'https://www.warcrafttavern.com/tbc/guides/kazrogal/' },
+          ]
+        },
+        "Azgalor": {
+          overview: `Azgalor is the fourth Hyjal boss. Doom is an unavoidable death-and-add mechanic, and Howl of Azgalor silences the raid — the fight tests add pickup and healing ahead of silences.`,
+          phases: [
+            { name: 'Single Phase + Doomguard adds', details: `<strong>Doom:</strong> Unavoidable debuff on a random player — it kills them and spawns a Lesser Doomguard. This is expected; an off-tank must pick up each Doomguard immediately. (Warlocks can help by taking Doom in a controlled way.)<br><strong>Rain of Fire:</strong> Move out or take stacking Unquenchable Flames.<br><strong>Howl of Azgalor:</strong> Raid-wide silence — heal/HoT AHEAD of it so nobody dies during the silence window.<br><strong>Cleave:</strong> Tanks face him away from the raid.` }
+          ],
+          tankStrategy: `Main tank faces Azgalor away for Cleave. Off-tank(s) must instantly pick up every Lesser Doomguard spawned by Doom — loose Doomguards shred healers. Keep the boss and adds separated.`,
+          healerStrategy: `Doom will kill its target — that's normal, don't panic-heal it. Instead pre-HoT and top the raid BEFORE Howl of Azgalor silences you, because you can't cast during the silence. Watch off-tanks on fresh Doomguards.`,
+          dpsStrategy: `Move out of Rain of Fire (don't stack Unquenchable Flames). Swap to Lesser Doomguards so off-tanks don't get overwhelmed, then back to boss. Expect the silence and don't rely on it for utility timing.`,
+          references: [
+            { title: 'Wowhead TBC Azgalor Guide', url: 'https://tbc.wowhead.com/guides/azgalor-battle-for-mount-hyjal-raid-strategy' },
+            { title: 'Warcraft Tavern — Azgalor Strategy', url: 'https://www.warcrafttavern.com/tbc/guides/azgalor/' },
+          ]
+        },
+        "Archimonde": {
+          overview: `Archimonde is the final boss of Mount Hyjal — a pure execution/positioning fight. Almost every death is avoidable: use Tears of the Goddess for Air Burst falls, don't get Feared into fire or off the platform, and dodge Doomfire.`,
+          phases: [
+            { name: 'Single Phase (positioning check)', details: `<strong>Air Burst:</strong> Throws a player into the air — pop Tears of the Goddess just before landing to negate FALL damage. With Tears used correctly there should be ZERO falling deaths.<br><strong>Fear:</strong> Tears do NOT stop Fear — use fear protection/dispels (Fear Ward, Tremor Totem, Berserker Rage) and never get feared off the platform or into Doomfire.<br><strong>Doomfire:</strong> Roaming fire that chases players — move away, don't kite it into the raid.<br><strong>Grip of the Legion / Soul Charge:</strong> Dispel, and spread so Soul Charge discharges don't chain.<br><strong>Finger of Death:</strong> Punishes players who stray too far — stay in the fight area.` }
+          ],
+          tankStrategy: `Keep Archimonde stationary and face him consistently. Positioning matters more than threat here — make sure the tank spot isn't near where Doomfire tends to travel, and hold the fixed camp so the raid can orient off you.`,
+          healerStrategy: `Everyone (including healers) must self-cast Tears of the Goddess before landing from Air Burst. Keep fear protection up and dispel Grip of the Legion. This is a movement fight — use instants while repositioning around Doomfire.`,
+          dpsStrategy: `Pop Tears before landing from Air Burst — no falling deaths. Use fear protection and don't get feared into Doomfire or off the ledge. Move away from Doomfire, spread for Soul Charge, and never run far enough to catch Finger of Death. Steady damage; survival is the DPS gain here.`,
+          references: [
+            { title: 'Wowhead TBC Archimonde Guide', url: 'https://tbc.wowhead.com/guides/archimonde-battle-for-mount-hyjal-raid-strategy' },
+            { title: 'Warcraft Tavern — Archimonde Strategy', url: 'https://www.warcrafttavern.com/tbc/guides/archimonde/' },
+          ]
+        },
+        "High Warlord Naj'entus": {
+          overview: `Naj'entus is the first boss of Black Temple. A gear/execution check built around clicking Impaling Spines — to free trapped players and to strip his Tidal Shield.`,
+          phases: [
+            { name: 'Single Phase (spine management)', details: `<strong>Impaling Spine:</strong> Impales and traps a random player — someone must CLICK the spine on the ground to free them (they take a stacking DoT until freed). The looted spine shard becomes a usable item.<br><strong>Tidal Shield:</strong> Naj'entus periodically shields himself and starts a raid-wide burst cast — throw a Spine Shard at him to STRIP the shield and interrupt it, or the raid takes massive damage.<br><strong>Needle Spine:</strong> AoE spike damage to random players — spread and keep the raid topped.<br><strong>Enrage:</strong> Hard enrage; keep the burn efficient.` }
+          ],
+          tankStrategy: `Straightforward tank & spank on threat. Keep him where ranged can reach dropped spines quickly. Watch your own health through the burst windows when Tidal Shield goes up.`,
+          healerStrategy: `Trapped players take a ramping DoT until freed — keep them alive while someone clicks the spine. Heal through Needle Spine spikes. When Tidal Shield goes up, be ready for raid burst if the shield isn't stripped in time.`,
+          dpsStrategy: `Assign spine-clickers: free trapped players FAST. Assign casters/ranged to grab spine shards and strip Tidal Shield the instant it appears — a missed strip is a raid-wide burst. Spread for Needle Spine and burn to beat the enrage.`,
+          references: [
+            { title: 'Wowhead TBC Naj\'entus Guide', url: 'https://tbc.wowhead.com/guides/high-warlord-najentus-black-temple-raid-strategy' },
+            { title: 'Warcraft Tavern — Naj\'entus Strategy', url: 'https://www.warcrafttavern.com/tbc/guides/high-warlord-najentus/' },
+          ]
+        },
+        "Supremus": {
+          overview: `Supremus is the second Black Temple boss — a two-phase movement fight. Phase 1 is tank & spank while dodging ground effects; Phase 2 he fixates and chases a random player who must kite him.`,
+          phases: [
+            { name: 'Phase 1 — Tank Phase', details: `Standard tanking with ground hazards:<br><strong>Molten Flame:</strong> Gouts of fire erupt from the ground — move out of them.<br><strong>Volcanic Geyser / Hurtful Strike:</strong> Tank pair required (Hurtful Strike hits the 2nd-highest threat) — keep an off-tank close.` },
+            { name: 'Phase 2 — Fixate/Kite Phase', details: `Supremus drops threat and FIXATES a random player, chasing them at moderate speed. That player must KITE him around the room while the raid keeps DPSing. Volcanic Geysers still erupt — the whole raid keeps moving out of fire. After a while he reverts to Phase 1.` }
+          ],
+          tankStrategy: `<strong>P1:</strong> Two tanks — main tank holds threat, off-tank stays in melee for Hurtful Strike. Dodge Molten Flame. <strong>P2:</strong> When he fixates, tanks stop tanking; be ready to re-establish threat the moment Phase 1 resumes.`,
+          healerStrategy: `<strong>P1:</strong> Watch the off-tank for Hurtful Strike. <strong>P2:</strong> Keep the fixated kiter alive and topped — they can't stop to be LoS'd. Everyone keeps moving out of Volcanic Geysers; use instants.`,
+          dpsStrategy: `Move out of Molten Flame and Volcanic Geysers always. <strong>P2:</strong> If you're fixated, KITE him — don't panic, he's not that fast; lead him in a wide arc while ranged keeps DPSing. Everyone else stays on the boss and out of fire.`,
+          references: [
+            { title: 'Wowhead TBC Supremus Guide', url: 'https://tbc.wowhead.com/guides/supremus-black-temple-raid-strategy' },
+            { title: 'Warcraft Tavern — Supremus Strategy', url: 'https://www.warcrafttavern.com/tbc/guides/supremus/' },
+          ]
+        },
+        "Shade of Akama": {
+          overview: `Shade of Akama is a coordinated add fight. Akama is held by Channelers and defenders; the raid frees him by killing Channelers in order and controlling the defender adds, then burns the Shade.`,
+          phases: [
+            { name: 'Add Phase → Shade Phase', details: `<strong>Channelers:</strong> Several Channelers keep the Shade rooted. Kill them in the assigned order to progressively free the Shade — each dead Channeler releases waves of adds.<br><strong>Defender / Sorcerer adds:</strong> Spawn and rush Akama — tanks and CC must lock them down and protect Akama or he dies.<br><strong>The Shade:</strong> Once freed it charges Akama — tanks intercept and the raid burns it down quickly.` }
+          ],
+          tankStrategy: `Assign tanks to the incoming defender/elite adds and to intercept the Shade when it's freed. Keep adds off Akama at all costs — protecting Akama is the whole fight. Pre-position for each Channeler kill's add wave.`,
+          healerStrategy: `Split healing between the add tanks and Akama. The dangerous moments are the add waves after each Channeler dies — pre-position and AoE-heal the tank cluster. Keep Akama topped; if he dies, it's a wipe.`,
+          dpsStrategy: `Follow the Channeler kill order exactly — killing out of order floods you with adds. Assign interrupts/CC to the caster adds. When the Shade is freed, everyone swaps and burns it fast. Protect Akama.`,
+          references: [
+            { title: 'Wowhead TBC Shade of Akama Guide', url: 'https://tbc.wowhead.com/guides/shade-of-akama-black-temple-raid-strategy' },
+            { title: 'Warcraft Tavern — Shade of Akama Strategy', url: 'https://www.warcrafttavern.com/tbc/guides/shade-of-akama/' },
+          ]
+        },
+        "Teron Gorefiend": {
+          overview: `Teron Gorefiend is an individual-accountability fight. Shadow of Death turns dead players into Constructs who must use a ghost ability bar to kill Vengeful Spirits — if they fail, the Spirits wipe the raid.`,
+          phases: [
+            { name: 'Single Phase (ghost mechanic)', details: `<strong>Shadow of Death:</strong> A debuff on a random player — when it expires the player DIES and becomes a ghostly Construct with a special action bar. They must use those abilities to kill the Vengeful Spirits (Spirit adds) before being resurrected; ignored Spirits fear/destroy the raid.<br><strong>Incinerate / Crushing Shadows:</strong> Heavy tank/raid damage — keep the tank up.<br><strong>Doom Blossom:</strong> Spawns overhead and casts Shadow Bolt — kill them or move.<br><strong>Enrage:</strong> Hard enrage — clean ghost play keeps DPS high.` }
+          ],
+          tankStrategy: `Hold Teron and face him away from the raid. Steady, high threat — the fight is long and has a hard enrage, so tank damage-taken efficiency and uptime matter. Be aware the Constructs are handled by dead players, not you.`,
+          healerStrategy: `Keep the tank up through Incinerate/Crushing Shadows. Note: Shadow of Death victims WILL die — that's intended; don't waste heals fighting it. Top the raid so the Vengeful Spirit phase isn't compounded by other damage.`,
+          dpsStrategy: `Know your ghost bar BEFORE the pull — when you get Shadow of Death and die, immediately use the Construct abilities to kill your Vengeful Spirits. Failed ghosts wipe the raid. Kill Doom Blossoms, and burn to beat the enrage.`,
+          references: [
+            { title: 'Wowhead TBC Teron Gorefiend Guide', url: 'https://tbc.wowhead.com/guides/teron-gorefiend-black-temple-raid-strategy' },
+            { title: 'Warcraft Tavern — Teron Gorefiend Strategy', url: 'https://www.warcrafttavern.com/tbc/guides/teron-gorefiend/' },
+          ]
+        },
+        "Gurtogg Bloodboil": {
+          overview: `Gurtogg Bloodboil is a rotation and tank-swap fight. Bloodboil targets the furthest players, and Fel Rage turns a random player into a temporary super-tank who needs huge healing.`,
+          phases: [
+            { name: 'Single Phase (soak rotation + Fel Rage)', details: `<strong>Bloodboil:</strong> Hits the FURTHEST players from Gurtogg with a stacking DoT — designate a soak group that rotates to the far position so the same people aren't stacked up.<br><strong>Fel Rage:</strong> Every ~60s he fixates a random player, buffs them, and beats on them like a tank — that player takes enormous damage and needs dedicated heavy healing until it ends.<br><strong>Acidic Wound / Arcing Smash:</strong> Tank melee debuff + cleave — spread and tank-face away.<br><strong>Eject:</strong> Knockback on the tank.` }
+          ],
+          tankStrategy: `Main tank holds Gurtogg and faces him away for Arcing Smash. When Fel Rage lands on a raider, they become the "tank" for that window — the real tanks just hold threat for the swap back. Manage Acidic Wound stacks and Eject knockbacks.`,
+          healerStrategy: `The Fel Rage target is your emergency — dump heavy healing on them or they die instantly, then release when it ends. Meanwhile keep the far Bloodboil soak group alive through their stacks. This is a coordinated triage fight.`,
+          dpsStrategy: `Know your Bloodboil soak assignment — rotate to the furthest position on cue so stacks spread across the group. Spread for Acidic Wound. When someone is Fel Raged, keep DPSing the boss; don't panic. Beat the enrage.`,
+          references: [
+            { title: 'Wowhead TBC Gurtogg Bloodboil Guide', url: 'https://tbc.wowhead.com/guides/gurtogg-bloodboil-black-temple-raid-strategy' },
+            { title: 'Warcraft Tavern — Gurtogg Bloodboil Strategy', url: 'https://www.warcrafttavern.com/tbc/guides/gurtogg-bloodboil/' },
+          ]
+        },
+        "Reliquary of Souls": {
+          overview: `Reliquary of Souls is a three-essence gauntlet. Each essence is effectively its own mini-boss with radically different rules — Phase 1 disables ALL healing, Phase 2 is an interrupt/dispel fight, Phase 3 is a threat-controlled burn.`,
+          phases: [
+            { name: 'Phase 1 — Essence of Suffering', details: `ALL healing and regen is DISABLED — no heals, HoTs, or healthstones work at all. It's a tank-rotation DPS race: swap the closest player every ~5s (Aura of Suffering + Fixate), use personal mitigation/cooldowns, and healers just conserve mana. Frenzy speeds it up — kill it before the raid is ground down.` },
+            { name: 'Phase 2 — Essence of Desire', details: `Healing works again. <strong>Spirit Shock:</strong> INTERRUPT it on a rotation. <strong>Rune Shield:</strong> dispel/purge it. <strong>Aura of Desire:</strong> mana-burns and REFLECTS a portion of damage taken back at the raid — avoid overhealing and unnecessary damage, watch mana. <strong>Deaden:</strong> amplifies damage on a target — heal through it.` },
+            { name: 'Phase 3 — Essence of Anger', details: `Escalating raid-wide damage burn. <strong>Spite:</strong> spread out so it doesn't chain. <strong>Soul Drain / Seethe:</strong> don't rip threat — Seethe punishes the highest non-tank threat. Blow cooldowns and kill it before the ramping damage overwhelms healers.` }
+          ],
+          tankStrategy: `<strong>P1:</strong> No healing — rotate tanking the fixate, use every personal cooldown, and swap the closest player as assigned. <strong>P2:</strong> Hold Desire steadily and support the interrupt/dispel rotation. <strong>P3:</strong> Lock threat hard so nobody gets Seethe'd; face Anger consistently for the burn.`,
+          healerStrategy: `<strong>P1:</strong> You literally CANNOT heal — conserve mana entirely and prep for P2. <strong>P2:</strong> Heal, but avoid OVERhealing (Aura of Desire reflects/mana-burns); support dispels/purges of Rune Shield. <strong>P3:</strong> Heavy escalating raid healing — pop mana and throughput cooldowns, spread for Spite.`,
+          dpsStrategy: `<strong>P1:</strong> Race — full cooldowns, and take your tank-swap turn on the fixate; there are NO heals so mitigate personally. <strong>P2:</strong> Interrupt Spirit Shock on your assignment, purge Rune Shield, and don't overdo self-damage (reflect). <strong>P3:</strong> Spread for Spite and do NOT pull threat (Seethe). Save Bloodlust for a phase your raid struggles with.`,
+          references: [
+            { title: 'Wowhead TBC Reliquary of Souls Guide', url: 'https://tbc.wowhead.com/guides/reliquary-of-souls-black-temple-raid-strategy' },
+            { title: 'Warcraft Tavern — Reliquary of Souls Strategy', url: 'https://www.warcrafttavern.com/tbc/guides/reliquary-of-souls/' },
+          ]
+        },
+        "Mother Shahraz": {
+          overview: `Mother Shahraz is a shadow-resistance and spread fight. Fatal Attraction teleports three players together and escalates their damage — instant spreading and a resistance-gear rotation are the whole encounter.`,
+          phases: [
+            { name: 'Single Phase (spread + resist)', details: `<strong>Fatal Attraction:</strong> Teleports 3 random players to each other and applies a debuff that ramps damage the longer they stay near ANYONE — the affected players must SPREAD apart instantly or they die. This is the primary killer.<br><strong>Saber Lash:</strong> Split-damage frontal cleave — tanks STACK together to share it.<br><strong>Prismatic Shield:</strong> She rotates through resistance schools; high shadow resistance gear (and Shadow Resist aura/totem) is required to survive the constant Shadow damage.<br><strong>Silencing Shriek:</strong> Raid-wide silence — heal ahead of it.` }
+          ],
+          tankStrategy: `Both tanks STACK on top of each other so Saber Lash split-damage is halved — tanking apart doubles the hit and kills a tank. Hold her steady in the assigned spot so the raid's spread positions stay consistent.`,
+          healerStrategy: `Wear shadow resistance and keep the raid topped through constant Prismatic-school damage. Heal ahead of Silencing Shriek. Fatal Attraction victims take rapidly escalating damage until they spread — be ready to burst-heal them the instant they separate.`,
+          dpsStrategy: `Everyone stacks shadow resistance. Pre-assign SPREAD positions: when Fatal Attraction hits you, immediately run to your spot away from everyone — staying near others is what kills the trio. Don't stand in front (Saber Lash is for the stacked tanks only).`,
+          references: [
+            { title: 'Wowhead TBC Mother Shahraz Guide', url: 'https://tbc.wowhead.com/guides/mother-shahraz-black-temple-raid-strategy' },
+            { title: 'Warcraft Tavern — Mother Shahraz Strategy', url: 'https://www.warcrafttavern.com/tbc/guides/mother-shahraz/' },
+          ]
+        },
+        "The Illidari Council": {
+          overview: `The Illidari Council is a four-boss council fight with a shared health pool — all four must be tanked separately and burned evenly while you interrupt heals and dodge ground effects.`,
+          phases: [
+            { name: 'Single Phase (four members, shared HP)', details: `The four share a health pool, so damage must be spread evenly and all die together.<br><strong>Lady Malande (healer):</strong> INTERRUPT her heals (Flash Heal / Reflective Shield) on a rotation, or the council never dies.<br><strong>High Nethermancer Zerevor:</strong> casts Blizzard/Flamestrike/Arcane — move out of his ground effects.<br><strong>Gathios the Shatterer:</strong> paladin — Consecration under him (melee move), Blessing of Protection/Spell Reflect; dispel/avoid.<br><strong>Veras Darkshadow:</strong> vanishes and applies Deadly Poison to a random player — dispel it.` }
+          ],
+          tankStrategy: `Assign one tank per council member and keep all four separated so their abilities don't overlap the raid. Hold them in fixed spots — the raid needs stable positions to dodge Consecration, Blizzard, and Flamestrike.`,
+          healerStrategy: `Spread and stay out of Zerevor's Blizzard/Flamestrike and Gathios' Consecration. Dispel Veras' Deadly Poison. Tank damage is spiky across four targets — cover all the tanks and heal through Malande's occasional damage.`,
+          dpsStrategy: `Interrupt Lady Malande's heals on a strict rotation — this is the fight. Spread damage EVENLY across all four (shared HP means uneven damage wastes time). Move out of Consecration/Blizzard/Flamestrike. Burn them down together.`,
+          references: [
+            { title: 'Wowhead TBC Illidari Council Guide', url: 'https://tbc.wowhead.com/guides/the-illidari-council-black-temple-raid-strategy' },
+            { title: 'Warcraft Tavern — Illidari Council Strategy', url: 'https://www.warcrafttavern.com/tbc/guides/illidari-council/' },
+          ]
+        },
+        "Illidan Stormrage": {
+          overview: `Illidan Stormrage is the final boss of Black Temple — a long, multi-phase execution test covering flame elementals, a demon-form shadow phase, and heavy positioning discipline.`,
+          phases: [
+            { name: 'Phase 1 — Melee/Fire', details: `<strong>Flame Crash:</strong> ground fire — move out. <strong>Draw Soul / Shear:</strong> heavy tank damage — keep the MT topped. <strong>Parasitic Shadowfiend:</strong> spawns adds off an infecting debuff — spread so it doesn't chain, and AoE the fiends.` },
+            { name: 'Phase 2 — Flames of Azzinoth', details: `Illidan summons two Blades that spawn Flames of Azzinoth elementals. TWO tanks (ideally high fire resist / hunters) each take one elemental and keep them APART — the Flames enrage if they touch. Kite the Blaze/Flame patches. Kill both elementals to progress.` },
+            { name: 'Phase 3 — Back to Illidan', details: `Return to Phase 1 abilities (Flame Crash, Shear, Parasitic). Keep the tank rotation and spread discipline until the demon transformation.` },
+            { name: 'Phase 4 — Demon Form', details: `Illidan transforms. <strong>Shadow Blast:</strong> heavy shadow AoE around the tank — a SHADOW-RESIST tank should hold demon Illidan. <strong>Shadow Prison:</strong> everyone must STOP MOVING — any movement deals escalating damage that kills you. <strong>Flame Burst</strong> raid damage. He can be forced out of demon form by aggro/threat mechanics.` },
+            { name: 'Phase 5 — Enrage/Burn', details: `Final phase blending prior mechanics with escalating pressure — blow all cooldowns, hold spread and positioning, and kill him before healers run dry.` }
+          ],
+          tankStrategy: `<strong>P1/P3:</strong> MT holds Illidan facing away; watch Shear spikes. <strong>P2:</strong> two elemental tanks each take one Flame of Azzinoth and keep them well APART (they enrage if they meet). <strong>P4:</strong> a shadow-resistance tank takes demon Illidan for Shadow Blast. Clean threat handoffs between every phase.`,
+          healerStrategy: `Keep the MT up through Shear/Draw Soul. <strong>P2:</strong> the fire-resist elemental tanks take heavy sustained damage — dedicate healers to each. <strong>P4:</strong> heal the shadow-resist tank through Shadow Blast, and during Shadow Prison DO NOT move to reposition — heal in place with instants. Manage mana for the long fight.`,
+          dpsStrategy: `Move out of Flame Crash; spread for Parasitic Shadowfiend and AoE the fiends. <strong>P2:</strong> help burn the Flames of Azzinoth and stay out of Blaze patches; never body-pull the two elementals together. <strong>P4:</strong> when Shadow Prison is cast, FREEZE — any movement escalates damage and kills you. Save Bloodlust for a burn phase and beat the enrage.`,
+          references: [
+            { title: 'Wowhead TBC Illidan Stormrage Guide', url: 'https://tbc.wowhead.com/guides/illidan-stormrage-black-temple-raid-strategy' },
+            { title: 'Warcraft Tavern — Illidan Stormrage Strategy', url: 'https://www.warcrafttavern.com/tbc/guides/illidan-stormrage/' },
+          ]
         }
       };
 
